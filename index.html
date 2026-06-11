@@ -111,6 +111,17 @@ nav{
 /* CARDS */
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.video-card{display:block}
+.video-card .thumb{
+  aspect-ratio:16/9;border-radius:10px;overflow:hidden;border:1px solid var(--line);
+  background:linear-gradient(135deg,var(--surface-2),var(--surface));
+}
+.video-card .thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s}
+.video-card:hover .thumb img{transform:scale(1.04)}
+.video-card h3{font-size:15px;font-weight:700;margin-top:12px;line-height:1.4;transition:color .2s}
+.video-card:hover h3{color:var(--yellow)}
+.video-card .date{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:6px}
 .card{
   border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);
   transition:transform .2s,border-color .2s;display:block;
@@ -185,7 +196,7 @@ footer{border-top:1px solid var(--line);padding:60px 0 36px;background:var(--sur
 a:focus-visible,button:focus-visible{outline:2px solid var(--yellow);outline-offset:3px;border-radius:4px}
 
 @media (max-width:900px){
-  .grid-3{grid-template-columns:repeat(2,1fr)}
+  .grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}
   .split{grid-template-columns:1fr;gap:40px}
   .footer-grid{grid-template-columns:1fr 1fr}
   .portrait{max-width:380px}
@@ -198,7 +209,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--yellow);outline-off
   }
   .nav-links.open{display:flex}
   .menu-toggle{display:block}
-  .grid-3,.grid-2{grid-template-columns:1fr}
+  .grid-3,.grid-2,.grid-4{grid-template-columns:1fr}
   .hero{padding:64px 0 48px}
 }
 </style>
@@ -286,9 +297,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--yellow);outline-off
       <a class="more-link" href="#videos">All videos →</a>
     </div>
     <div class="grid-3" id="home-videos-grid">
-      <a class="card" href="#videos"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">AI Video</span><h3>Placeholder: latest upload pulls in here automatically</h3></div></a>
-      <a class="card" href="#videos"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Workflow</span><h3>Placeholder: second latest upload</h3></div></a>
-      <a class="card" href="#videos"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Editing</span><h3>Placeholder: third latest upload</h3></div></a>
+      <a class="video-card" href="#videos"><div class="thumb"></div><h3>Placeholder: latest upload pulls in here automatically</h3></a>
+      <a class="video-card" href="#videos"><div class="thumb"></div><h3>Placeholder: second latest upload</h3></a>
+      <a class="video-card" href="#videos"><div class="thumb"></div><h3>Placeholder: third latest upload</h3></a>
     </div>
   </div>
 </section>
@@ -315,19 +326,22 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--yellow);outline-off
   <p>Latest uploads land here automatically. Below that, the greatest hits: the videos worth starting with.</p>
 </div></header>
 <section style="padding-top:24px"><div class="wrap">
-  <div class="section-head"><div><h2 style="margin-top:0">Latest uploads</h2></div></div>
-  <div class="grid-3" id="videos-latest-grid">
-    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Auto-feed</span><h3>RSS placeholder 1</h3></div></a>
-    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Auto-feed</span><h3>RSS placeholder 2</h3></div></a>
-    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Auto-feed</span><h3>RSS placeholder 3</h3></div></a>
+  <p class="eyebrow">On the feed</p>
+  <h2 style="margin-top:0">Latest videos</h2>
+  <p style="color:var(--muted);max-width:640px;margin-bottom:18px">The reviews happen on the channel — hands-on tests, comparisons, and breakdowns of the AI tools covered on this site. This page updates automatically as new videos land.</p>
+  <a class="more-link" href="https://www.youtube.com/SebastienJefferies/" target="_blank" rel="noopener" style="display:inline-block;margin-bottom:32px">Subscribe on YouTube →</a>
+  <div class="grid-4" id="videos-latest-grid">
+    <a class="video-card" href="#"><div class="thumb"></div><h3>Latest upload pulls in here automatically</h3></a>
+    <a class="video-card" href="#"><div class="thumb"></div><h3>Second latest upload</h3></a>
+    <a class="video-card" href="#"><div class="thumb"></div><h3>Third latest upload</h3></a>
+    <a class="video-card" href="#"><div class="thumb"></div><h3>Fourth latest upload</h3></a>
   </div>
   <div class="section-head" style="margin-top:64px"><div><h2 style="margin-top:0">Start here</h2><p>Curated by Seb. The videos that explain the most, fastest.</p></div></div>
-  <div class="grid-3">
-    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Curated</span><h3>Awaiting your greatest hits list</h3></div></a>
-    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Curated</span><h3>Awaiting your greatest hits list</h3></div></a>
-    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Curated</span><h3>Awaiting your greatest hits list</h3></div></a>
+  <div class="grid-3" id="videos-curated-grid">
+    <a class="video-card" href="#"><div class="thumb"></div><h3>Awaiting your greatest hits list</h3></a>
+    <a class="video-card" href="#"><div class="thumb"></div><h3>Awaiting your greatest hits list</h3></a>
+    <a class="video-card" href="#"><div class="thumb"></div><h3>Awaiting your greatest hits list</h3></a>
   </div>
-  <p class="note"><b>To do:</b> Seb sends 10 to 20 curated video URLs. Each becomes a card with real thumbnail, title and link.</p>
 </div></section>
 </div>
 
@@ -505,21 +519,34 @@ function showPage(name){
 window.addEventListener("hashchange",route);
 route();
 
-// ===== Latest videos (YouTube RSS via Pages Function) =====
+// ===== Latest videos (YouTube RSS via Worker, Shorts filtered out) =====
+function formatVideoDate(iso){
+  if(!iso)return "";
+  const d=new Date(iso);
+  if(isNaN(d))return "";
+  return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+}
 async function loadVideos(){
   try{
     const res=await fetch("/api/videos");
     const data=await res.json();
     const videos=(data.videos||[]).filter(v=>v.id);
-    if(!videos.length)return;
+    const curated=(data.curated||[]).filter(v=>v.id);
 
-    const cardHTML=(v,tag)=>`<a class="card" href="${v.link}" target="_blank" rel="noopener"><div class="thumb"><img src="${v.thumbnail}" alt="" loading="lazy"><div class="play">▶</div></div><div class="meta"><span class="tag">${tag}</span><h3>${escapeHTML(v.title)}</h3></div></a>`;
+    const cardHTML=(v)=>`<a class="video-card" href="${v.link}" target="_blank" rel="noopener"><div class="thumb"><img src="${v.thumbnail}" alt="" loading="lazy"></div><h3>${escapeHTML(v.title)}</h3>${v.published?`<div class="date">${formatVideoDate(v.published)}</div>`:""}</a>`;
 
-    const home=document.getElementById("home-videos-grid");
-    if(home)home.innerHTML=videos.slice(0,3).map(v=>cardHTML(v,"Latest")).join("");
+    if(videos.length){
+      const home=document.getElementById("home-videos-grid");
+      if(home)home.innerHTML=videos.slice(0,3).map(cardHTML).join("");
 
-    const latest=document.getElementById("videos-latest-grid");
-    if(latest)latest.innerHTML=videos.slice(0,3).map(v=>cardHTML(v,"Auto-feed")).join("");
+      const latest=document.getElementById("videos-latest-grid");
+      if(latest)latest.innerHTML=videos.slice(0,8).map(cardHTML).join("");
+    }
+
+    if(curated.length){
+      const curatedGrid=document.getElementById("videos-curated-grid");
+      if(curatedGrid)curatedGrid.innerHTML=curated.map(cardHTML).join("");
+    }
   }catch(e){
     console.error("Failed to load videos",e);
   }
