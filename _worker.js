@@ -55,11 +55,25 @@ async function handleVideos() {
     const shorts = await getShorts();
     const shortIds = new Set(shorts.map((v) => v.id));
 
-    const [videos, curated, popular] = await Promise.all([
+    let [videos, curated, popular] = await Promise.all([
       getLatest(shortIds),
       getCurated(shortIds),
       getPopular(shortIds),
     ]);
+
+    // If the RSS feed didn't yield enough true 16:9 videos (e.g. recent
+    // uploads were mostly Shorts), backfill "Latest videos" from the
+    // channel's "Videos" tab sorted by upload date.
+    if (videos.length < MAX_VIDEOS) {
+      const seen = new Set(videos.map((v) => v.id));
+      const extra = await getChannelVideosByDate(shortIds);
+      for (const v of extra) {
+        if (videos.length >= MAX_VIDEOS) break;
+        if (seen.has(v.id)) continue;
+        seen.add(v.id);
+        videos.push(v);
+      }
+    }
 
     return jsonResponse({ videos, curated, popular, shorts });
   } catch (err) {
@@ -161,6 +175,50 @@ async function getPopular(shortIds) {
 
     const filtered = await filterOutShorts(parsed, shortIds);
     return filtered.slice(0, MAX_POPULAR);
+  } catch {
+    return [];
+  }
+}
+
+// ===== Channel "Videos" tab sorted by upload date, 16:9 only =====
+// Used to backfill "Latest videos" if the RSS feed doesn't have enough
+// true 16:9 entries (e.g. the channel's most recent uploads were Shorts).
+async function getChannelVideosByDate(shortIds) {
+  try {
+    const url = `https://www.youtube.com/@${CHANNEL_HANDLE}/videos?view=0&sort=dd&flow=grid&hl=en&gl=US`;
+    const res = await fetch(url, {
+      cf: { cacheTtl: 21600, cacheEverything: true },
+      headers: BROWSER_HEADERS,
+    });
+    if (!res.ok) return [];
+
+    const html = await res.text();
+    const data = extractYtInitialData(html);
+    if (!data) return [];
+
+    const renderers = findAll(data, "lockupViewModel");
+    const parsed = renderers
+      .filter((v) => v.contentType === "LOCKUP_CONTENT_TYPE_VIDEO" && v.contentId)
+      .slice(0, MAX_VIDEOS * 2)
+      .map((v) => {
+        const videoId = v.contentId;
+        const title = v.metadata?.lockupMetadataViewModel?.title?.content || "";
+        const sources = v.contentImage?.thumbnailViewModel?.image?.sources || [];
+        const thumbnail = sources.length
+          ? sources[sources.length - 1].url
+          : `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+        return {
+          id: videoId,
+          title,
+          link: `https://www.youtube.com/watch?v=${videoId}`,
+          thumbnail,
+          published: "",
+        };
+      })
+      .filter((v) => v.id);
+
+    return await filterOutShorts(parsed, shortIds);
   } catch {
     return [];
   }
