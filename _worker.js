@@ -1,11 +1,25 @@
 // Cloudflare Worker (Workers + Static Assets)
-// Serves the static site, and handles /api/videos by fetching
-// Seb's YouTube RSS feed (latest uploads) plus a curated "start here"
-// list, returning both as JSON. YouTube Shorts (9:16 vertical videos)
-// are filtered out of both lists via an oEmbed dimension check.
+// Serves the static site, and handles /api/videos by fetching:
+//  - Seb's YouTube RSS feed -> "videos" (latest uploads, 16:9 only)
+//  - A curated "start here" list -> "curated" (16:9 only)
+//  - The channel's "Videos" tab sorted by popularity -> "popular" (16:9 only)
+//  - The channel's "Shorts" tab -> "shorts" (9:16 vertical clips)
+//
+// YouTube Shorts (9:16 vertical videos) are filtered out of the
+// "videos", "curated" and "popular" lists via an oEmbed dimension check.
 
-const FEED_URL = "https://www.youtube.com/feeds/videos.xml?channel_id=UCqcCVUAeQg90KQknq7H-7uA";
-const MAX_VIDEOS = 16;
+const CHANNEL_ID = "UCqcCVUAeQg90KQknq7H-7uA";
+const CHANNEL_HANDLE = "SebastienJefferies";
+const FEED_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
+const MAX_VIDEOS = 12;
+const MAX_POPULAR = 8;
+const MAX_SHORTS = 12;
+
+const BROWSER_HEADERS = {
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+  "Accept-Language": "en-US,en;q=0.9",
+  Cookie: "CONSENT=YES+1",
+};
 
 // Curated "Start here" list, pulled from Seb's video list.
 const CURATED = [
@@ -37,56 +51,165 @@ export default {
 
 async function handleVideos() {
   try {
-    let videos = [];
+    const [videos, curated, popular, shorts] = await Promise.all([
+      getLatest(),
+      getCurated(),
+      getPopular(),
+      getShorts(),
+    ]);
 
+    return jsonResponse({ videos, curated, popular, shorts });
+  } catch (err) {
+    return jsonResponse({ videos: [], curated: [], popular: [], shorts: [], error: "unexpected_error" });
+  }
+}
+
+// ===== Latest uploads (RSS feed), 16:9 only =====
+async function getLatest() {
+  try {
     const res = await fetch(FEED_URL, {
       cf: { cacheTtl: 1800, cacheEverything: true },
       headers: { "User-Agent": "Mozilla/5.0 (compatible; sebastienjefferies.com video feed)" },
     });
+    if (!res.ok) return [];
 
-    if (res.ok) {
-      const xml = await res.text();
-      const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].map((m) => m[1]);
+    const xml = await res.text();
+    const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].map((m) => m[1]);
 
-      const parsed = entries
-        .slice(0, MAX_VIDEOS)
-        .map((entry) => {
-          const videoId = match(entry, /<yt:videoId>(.*?)<\/yt:videoId>/);
-          const title = decodeEntities(match(entry, /<title>([\s\S]*?)<\/title>/));
-          const published = match(entry, /<published>(.*?)<\/published>/);
-          const thumbnail =
-            match(entry, /<media:thumbnail url="(.*?)"/) ||
-            (videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : "");
+    const parsed = entries
+      .slice(0, MAX_VIDEOS)
+      .map((entry) => {
+        const videoId = match(entry, /<yt:videoId>(.*?)<\/yt:videoId>/);
+        const title = decodeEntities(match(entry, /<title>([\s\S]*?)<\/title>/));
+        const published = match(entry, /<published>(.*?)<\/published>/);
+        const thumbnail =
+          match(entry, /<media:thumbnail url="(.*?)"/) ||
+          (videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : "");
 
-          return {
-            id: videoId,
-            title,
-            link: videoId ? `https://www.youtube.com/watch?v=${videoId}` : "",
-            thumbnail,
-            published,
-          };
-        })
-        .filter((v) => v.id);
+        return {
+          id: videoId,
+          title,
+          link: videoId ? `https://www.youtube.com/watch?v=${videoId}` : "",
+          thumbnail,
+          published,
+        };
+      })
+      .filter((v) => v.id);
 
-      // Filter out YouTube Shorts (9:16 vertical videos) - keep 16:9 only.
-      const flags = await Promise.all(parsed.map((v) => isShort(v.id)));
-      videos = parsed.filter((_, i) => !flags[i]);
-    }
+    return await filterOutShorts(parsed);
+  } catch {
+    return [];
+  }
+}
 
-    // Curated "start here" list - also filtered for Shorts.
-    const curatedFlags = await Promise.all(CURATED.map((v) => isShort(v.id)));
-    const curated = CURATED.filter((_, i) => !curatedFlags[i]).map((v) => ({
+// ===== Curated "start here" list, 16:9 only =====
+async function getCurated() {
+  try {
+    const list = CURATED.map((v) => ({
       id: v.id,
       title: v.title,
       link: `https://www.youtube.com/watch?v=${v.id}`,
       thumbnail: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
       published: "",
     }));
-
-    return jsonResponse({ videos, curated });
-  } catch (err) {
-    return jsonResponse({ videos: [], curated: [], error: "unexpected_error" });
+    return await filterOutShorts(list);
+  } catch {
+    return [];
   }
+}
+
+// ===== Most popular videos (channel "Videos" tab sorted by popularity), 16:9 only =====
+async function getPopular() {
+  try {
+    const url = `https://www.youtube.com/@${CHANNEL_HANDLE}/videos?view=0&sort=p&flow=grid&hl=en&gl=US`;
+    const res = await fetch(url, {
+      cf: { cacheTtl: 21600, cacheEverything: true },
+      headers: BROWSER_HEADERS,
+    });
+    if (!res.ok) return [];
+
+    const html = await res.text();
+    const data = extractYtInitialData(html);
+    if (!data) return [];
+
+    const renderers = findAll(data, "videoRenderer");
+    const parsed = renderers
+      .slice(0, MAX_POPULAR)
+      .map((v) => {
+        const videoId = v.videoId;
+        const title = v.title?.runs?.[0]?.text || v.title?.simpleText || "";
+        const thumbs = v.thumbnail?.thumbnails || [];
+        const thumbnail = thumbs.length
+          ? thumbs[thumbs.length - 1].url
+          : videoId
+          ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+          : "";
+
+        return {
+          id: videoId,
+          title,
+          link: videoId ? `https://www.youtube.com/watch?v=${videoId}` : "",
+          thumbnail,
+          published: "",
+        };
+      })
+      .filter((v) => v.id);
+
+    return await filterOutShorts(parsed);
+  } catch {
+    return [];
+  }
+}
+
+// ===== Quick videos (recent Shorts from the channel "Shorts" tab), 9:16 =====
+async function getShorts() {
+  try {
+    const url = `https://www.youtube.com/@${CHANNEL_HANDLE}/shorts?hl=en&gl=US`;
+    const res = await fetch(url, {
+      cf: { cacheTtl: 21600, cacheEverything: true },
+      headers: BROWSER_HEADERS,
+    });
+    if (!res.ok) return [];
+
+    const html = await res.text();
+    const data = extractYtInitialData(html);
+    if (!data) return [];
+
+    const renderers = findAll(data, "reelItemRenderer");
+    return renderers
+      .slice(0, MAX_SHORTS)
+      .map((v) => {
+        const videoId = v.videoId;
+        const title =
+          v.headline?.simpleText ||
+          v.headline?.runs?.[0]?.text ||
+          v.accessibility?.accessibilityData?.label ||
+          "";
+        const thumbs = v.thumbnail?.thumbnails || [];
+        const thumbnail = thumbs.length
+          ? thumbs[thumbs.length - 1].url
+          : videoId
+          ? `https://i.ytimg.com/vi/${videoId}/oardefault.jpg`
+          : "";
+
+        return {
+          id: videoId,
+          title,
+          link: videoId ? `https://www.youtube.com/shorts/${videoId}` : "",
+          thumbnail,
+          published: "",
+        };
+      })
+      .filter((v) => v.id);
+  } catch {
+    return [];
+  }
+}
+
+// Filters a list of {id,...} videos, removing any that are YouTube Shorts.
+async function filterOutShorts(list) {
+  const flags = await Promise.all(list.map((v) => isShort(v.id)));
+  return list.filter((_, i) => !flags[i]);
 }
 
 // Uses YouTube's oEmbed endpoint to check the embed dimensions.
@@ -109,6 +232,32 @@ async function isShort(videoId) {
     return height > width;
   } catch {
     return false;
+  }
+}
+
+// Recursively collects every value found under the given key name
+// anywhere in a (possibly huge) nested object/array, e.g. every
+// "videoRenderer" or "reelItemRenderer" in YouTube's ytInitialData.
+function findAll(obj, key, results = []) {
+  if (!obj || typeof obj !== "object") return results;
+  if (Object.prototype.hasOwnProperty.call(obj, key)) results.push(obj[key]);
+  for (const k in obj) {
+    const val = obj[k];
+    if (val && typeof val === "object") findAll(val, key, results);
+  }
+  return results;
+}
+
+function extractYtInitialData(html) {
+  const m =
+    html.match(/var ytInitialData\s*=\s*(\{.*?\});<\/script>/s) ||
+    html.match(/ytInitialData"\]\s*=\s*(\{.*?\});/s) ||
+    html.match(/ytInitialData\s*=\s*(\{.*?\});/s);
+  if (!m) return null;
+  try {
+    return JSON.parse(m[1]);
+  } catch {
+    return null;
   }
 }
 

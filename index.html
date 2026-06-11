@@ -112,6 +112,7 @@ nav{
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.grid-6{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
 .video-card{display:block}
 .video-card .thumb{
   aspect-ratio:16/9;border-radius:10px;overflow:hidden;border:1px solid var(--line);
@@ -122,6 +123,8 @@ nav{
 .video-card h3{font-size:15px;font-weight:700;margin-top:12px;line-height:1.4;transition:color .2s}
 .video-card:hover h3{color:var(--yellow)}
 .video-card .date{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.video-card.vertical .thumb{aspect-ratio:9/16}
+.video-card.vertical h3{font-size:13px}
 .card{
   border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);
   transition:transform .2s,border-color .2s;display:block;
@@ -197,6 +200,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--yellow);outline-off
 
 @media (max-width:900px){
   .grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}
+  .grid-6{grid-template-columns:repeat(3,1fr)}
   .split{grid-template-columns:1fr;gap:40px}
   .footer-grid{grid-template-columns:1fr 1fr}
   .portrait{max-width:380px}
@@ -210,6 +214,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--yellow);outline-off
   .nav-links.open{display:flex}
   .menu-toggle{display:block}
   .grid-3,.grid-2,.grid-4{grid-template-columns:1fr}
+  .grid-6{grid-template-columns:repeat(2,1fr)}
   .hero{padding:64px 0 48px}
 }
 </style>
@@ -341,6 +346,22 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--yellow);outline-off
     <a class="video-card" href="#"><div class="thumb"></div><h3>Awaiting your greatest hits list</h3></a>
     <a class="video-card" href="#"><div class="thumb"></div><h3>Awaiting your greatest hits list</h3></a>
     <a class="video-card" href="#"><div class="thumb"></div><h3>Awaiting your greatest hits list</h3></a>
+  </div>
+  <div class="section-head" style="margin-top:64px" id="videos-popular-section"><div><h2 style="margin-top:0">Most popular videos</h2><p>The videos viewers come back to most.</p></div></div>
+  <div class="grid-4" id="videos-popular-grid">
+    <a class="video-card" href="#"><div class="thumb"></div><h3>Popular videos load in here automatically</h3></a>
+    <a class="video-card" href="#"><div class="thumb"></div><h3>Popular videos load in here automatically</h3></a>
+    <a class="video-card" href="#"><div class="thumb"></div><h3>Popular videos load in here automatically</h3></a>
+    <a class="video-card" href="#"><div class="thumb"></div><h3>Popular videos load in here automatically</h3></a>
+  </div>
+  <div class="section-head" style="margin-top:64px" id="videos-shorts-section"><div><h2 style="margin-top:0">Quick videos</h2><p>Short, fast hits from the last 90 days.</p></div></div>
+  <div class="grid-6" id="videos-shorts-grid">
+    <a class="video-card vertical" href="#"><div class="thumb"></div><h3>Shorts load in here automatically</h3></a>
+    <a class="video-card vertical" href="#"><div class="thumb"></div><h3>Shorts load in here automatically</h3></a>
+    <a class="video-card vertical" href="#"><div class="thumb"></div><h3>Shorts load in here automatically</h3></a>
+    <a class="video-card vertical" href="#"><div class="thumb"></div><h3>Shorts load in here automatically</h3></a>
+    <a class="video-card vertical" href="#"><div class="thumb"></div><h3>Shorts load in here automatically</h3></a>
+    <a class="video-card vertical" href="#"><div class="thumb"></div><h3>Shorts load in here automatically</h3></a>
   </div>
 </div></section>
 </div>
@@ -532,8 +553,11 @@ async function loadVideos(){
     const data=await res.json();
     const videos=(data.videos||[]).filter(v=>v.id);
     const curated=(data.curated||[]).filter(v=>v.id);
+    const popular=(data.popular||[]).filter(v=>v.id);
+    const shorts=(data.shorts||[]).filter(v=>v.id);
 
     const cardHTML=(v)=>`<a class="video-card" href="${v.link}" target="_blank" rel="noopener"><div class="thumb"><img src="${v.thumbnail}" alt="" loading="lazy"></div><h3>${escapeHTML(v.title)}</h3>${v.published?`<div class="date">${formatVideoDate(v.published)}</div>`:""}</a>`;
+    const verticalCardHTML=(v)=>`<a class="video-card vertical" href="${v.link}" target="_blank" rel="noopener"><div class="thumb"><img src="${v.thumbnail}" alt="" loading="lazy"></div><h3>${escapeHTML(v.title)}</h3></a>`;
 
     if(videos.length){
       const home=document.getElementById("home-videos-grid");
@@ -546,6 +570,24 @@ async function loadVideos(){
     if(curated.length){
       const curatedGrid=document.getElementById("videos-curated-grid");
       if(curatedGrid)curatedGrid.innerHTML=curated.map(cardHTML).join("");
+    }
+
+    const popularSection=document.getElementById("videos-popular-section");
+    const popularGrid=document.getElementById("videos-popular-grid");
+    if(popular.length){
+      if(popularGrid)popularGrid.innerHTML=popular.slice(0,8).map(cardHTML).join("");
+    }else{
+      if(popularSection)popularSection.style.display="none";
+      if(popularGrid)popularGrid.style.display="none";
+    }
+
+    const shortsSection=document.getElementById("videos-shorts-section");
+    const shortsGrid=document.getElementById("videos-shorts-grid");
+    if(shorts.length){
+      if(shortsGrid)shortsGrid.innerHTML=shorts.slice(0,12).map(verticalCardHTML).join("");
+    }else{
+      if(shortsSection)shortsSection.style.display="none";
+      if(shortsGrid)shortsGrid.style.display="none";
     }
   }catch(e){
     console.error("Failed to load videos",e);
