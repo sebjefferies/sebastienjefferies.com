@@ -132,23 +132,23 @@ async function getPopular() {
     const data = extractYtInitialData(html);
     if (!data) return [];
 
-    const renderers = findAll(data, "videoRenderer");
+    // Modern YouTube grid items use "lockupViewModel" objects.
+    const renderers = findAll(data, "lockupViewModel");
     const parsed = renderers
+      .filter((v) => v.contentType === "LOCKUP_CONTENT_TYPE_VIDEO" && v.contentId)
       .slice(0, MAX_POPULAR)
       .map((v) => {
-        const videoId = v.videoId;
-        const title = v.title?.runs?.[0]?.text || v.title?.simpleText || "";
-        const thumbs = v.thumbnail?.thumbnails || [];
-        const thumbnail = thumbs.length
-          ? thumbs[thumbs.length - 1].url
-          : videoId
-          ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
-          : "";
+        const videoId = v.contentId;
+        const title = v.metadata?.lockupMetadataViewModel?.title?.content || "";
+        const sources = v.contentImage?.thumbnailViewModel?.image?.sources || [];
+        const thumbnail = sources.length
+          ? sources[sources.length - 1].url
+          : `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
         return {
           id: videoId,
           title,
-          link: videoId ? `https://www.youtube.com/watch?v=${videoId}` : "",
+          link: `https://www.youtube.com/watch?v=${videoId}`,
           thumbnail,
           published: "",
         };
@@ -175,19 +175,19 @@ async function getShorts() {
     const data = extractYtInitialData(html);
     if (!data) return [];
 
-    const renderers = findAll(data, "reelItemRenderer");
+    // Modern YouTube Shorts shelves use "shortsLockupViewModel" objects.
+    const renderers = findAll(data, "shortsLockupViewModel");
     return renderers
       .slice(0, MAX_SHORTS)
       .map((v) => {
-        const videoId = v.videoId;
+        const videoId = match(v.entityId || "", /shorts-shelf-item-(.+)$/);
         const title =
-          v.headline?.simpleText ||
-          v.headline?.runs?.[0]?.text ||
-          v.accessibility?.accessibilityData?.label ||
+          v.overlayMetadata?.primaryText?.content ||
+          v.accessibilityText ||
           "";
-        const thumbs = v.thumbnail?.thumbnails || [];
-        const thumbnail = thumbs.length
-          ? thumbs[thumbs.length - 1].url
+        const sources = v.thumbnailViewModel?.thumbnailViewModel?.image?.sources || [];
+        const thumbnail = sources.length
+          ? sources[sources.length - 1].url
           : videoId
           ? `https://i.ytimg.com/vi/${videoId}/oardefault.jpg`
           : "";
