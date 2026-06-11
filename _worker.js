@@ -12,8 +12,9 @@ const CHANNEL_ID = "UCqcCVUAeQg90KQknq7H-7uA";
 const CHANNEL_HANDLE = "SebastienJefferies";
 const FEED_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
 const MAX_VIDEOS = 12;
+const MAX_RSS_ENTRIES = 30;
 const MAX_POPULAR = 8;
-const MAX_SHORTS = 12;
+const MAX_SHORTS = 24;
 
 const BROWSER_HEADERS = {
   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
@@ -51,11 +52,13 @@ export default {
 
 async function handleVideos() {
   try {
-    const [videos, curated, popular, shorts] = await Promise.all([
-      getLatest(),
-      getCurated(),
-      getPopular(),
-      getShorts(),
+    const shorts = await getShorts();
+    const shortIds = new Set(shorts.map((v) => v.id));
+
+    const [videos, curated, popular] = await Promise.all([
+      getLatest(shortIds),
+      getCurated(shortIds),
+      getPopular(shortIds),
     ]);
 
     return jsonResponse({ videos, curated, popular, shorts });
@@ -65,7 +68,7 @@ async function handleVideos() {
 }
 
 // ===== Latest uploads (RSS feed), 16:9 only =====
-async function getLatest() {
+async function getLatest(shortIds) {
   try {
     const res = await fetch(FEED_URL, {
       cf: { cacheTtl: 1800, cacheEverything: true },
@@ -77,7 +80,7 @@ async function getLatest() {
     const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].map((m) => m[1]);
 
     const parsed = entries
-      .slice(0, MAX_VIDEOS)
+      .slice(0, MAX_RSS_ENTRIES)
       .map((entry) => {
         const videoId = match(entry, /<yt:videoId>(.*?)<\/yt:videoId>/);
         const title = decodeEntities(match(entry, /<title>([\s\S]*?)<\/title>/));
@@ -96,14 +99,15 @@ async function getLatest() {
       })
       .filter((v) => v.id);
 
-    return await filterOutShorts(parsed);
+    const filtered = await filterOutShorts(parsed, shortIds);
+    return filtered.slice(0, MAX_VIDEOS);
   } catch {
     return [];
   }
 }
 
 // ===== Curated "start here" list, 16:9 only =====
-async function getCurated() {
+async function getCurated(shortIds) {
   try {
     const list = CURATED.map((v) => ({
       id: v.id,
@@ -112,14 +116,14 @@ async function getCurated() {
       thumbnail: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
       published: "",
     }));
-    return await filterOutShorts(list);
+    return await filterOutShorts(list, shortIds);
   } catch {
     return [];
   }
 }
 
 // ===== Most popular videos (channel "Videos" tab sorted by popularity), 16:9 only =====
-async function getPopular() {
+async function getPopular(shortIds) {
   try {
     const url = `https://www.youtube.com/@${CHANNEL_HANDLE}/videos?view=0&sort=p&flow=grid&hl=en&gl=US`;
     const res = await fetch(url, {
@@ -136,7 +140,7 @@ async function getPopular() {
     const renderers = findAll(data, "lockupViewModel");
     const parsed = renderers
       .filter((v) => v.contentType === "LOCKUP_CONTENT_TYPE_VIDEO" && v.contentId)
-      .slice(0, MAX_POPULAR)
+      .slice(0, MAX_POPULAR * 2)
       .map((v) => {
         const videoId = v.contentId;
         const title = v.metadata?.lockupMetadataViewModel?.title?.content || "";
@@ -155,7 +159,8 @@ async function getPopular() {
       })
       .filter((v) => v.id);
 
-    return await filterOutShorts(parsed);
+    const filtered = await filterOutShorts(parsed, shortIds);
+    return filtered.slice(0, MAX_POPULAR);
   } catch {
     return [];
   }
@@ -207,8 +212,13 @@ async function getShorts() {
 }
 
 // Filters a list of {id,...} videos, removing any that are YouTube Shorts.
-async function filterOutShorts(list) {
-  const flags = await Promise.all(list.map((v) => isShort(v.id)));
+// Uses the known-Shorts ID set (scraped from the Shorts tab) as the primary
+// signal, falling back to an oEmbed dimension check for anything not in it.
+async function filterOutShorts(list, shortIds) {
+  const ids = shortIds || new Set();
+  const flags = await Promise.all(
+    list.map((v) => (ids.has(v.id) ? Promise.resolve(true) : isShort(v.id)))
+  );
   return list.filter((_, i) => !flags[i]);
 }
 
