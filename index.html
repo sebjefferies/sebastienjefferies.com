@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sebastien Jefferies — AI Tools, Decoded for Creators</title>
+<meta name="description" content="AI tools, tech and video editing, broken down for creators who want results, not hype.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0B0B;
+  --surface:#131313;
+  --surface-2:#1C1C1C;
+  --line:#2A2A2A;
+  --yellow:#FFFF01;
+  --yellow-dim:rgba(255,255,1,.12);
+  --white:#F5F5F0;
+  --muted:#9A9A92;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);color:var(--white);
+  font-family:'Space Grotesk',sans-serif;font-size:17px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--yellow);color:var(--ink)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.eyebrow{
+  font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--yellow);display:flex;align-items:center;gap:10px;
+}
+.eyebrow::before{content:"";width:24px;height:2px;background:var(--yellow)}
+h1,h2,h3.display{font-family:'Unbounded',sans-serif;line-height:1.12;letter-spacing:-.01em}
+h2{font-size:clamp(26px,3.6vw,40px);font-weight:700;margin:14px 0 18px}
+.hl{
+  background:var(--yellow);color:var(--ink);
+  padding:0 .14em;box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+section{padding:88px 0}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:40px}
+.section-head p{color:var(--muted);max-width:540px}
+.more-link{
+  font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.08em;
+  color:var(--yellow);white-space:nowrap;border-bottom:1px solid transparent;transition:border-color .2s;
+}
+.more-link:hover{border-color:var(--yellow)}
+.btn{
+  display:inline-block;padding:13px 26px;border-radius:4px;
+  font-weight:700;font-size:15px;transition:transform .15s,box-shadow .15s;cursor:pointer;border:0;
+}
+.btn-primary{background:var(--yellow);color:var(--ink);box-shadow:0 0 0 rgba(255,255,1,0)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(255,255,1,.25)}
+.btn-ghost{border:1px solid var(--line);color:var(--white)}
+.btn-ghost:hover{border-color:var(--yellow)}
+.note{
+  font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);
+  border:1px dashed var(--line);border-radius:6px;padding:14px 16px;margin-top:24px;
+}
+.note b{color:var(--yellow)}
+
+/* NAV */
+nav{
+  position:sticky;top:0;z-index:50;background:rgba(11,11,11,.88);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
+.logo{font-family:'Unbounded',sans-serif;font-weight:900;font-size:14px;letter-spacing:.02em;white-space:nowrap}
+.logo span{color:var(--yellow)}
+.nav-links{display:flex;gap:24px;align-items:center;font-size:15px}
+.nav-links a{color:var(--muted);transition:color .2s;white-space:nowrap}
+.nav-links a:hover{color:var(--white)}
+.nav-links a.active{color:var(--yellow)}
+.nav-cta{padding:9px 18px;font-size:14px}
+.menu-toggle{display:none;background:none;border:0;color:var(--white);font-size:24px;cursor:pointer}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* HERO */
+.hero{padding:104px 0 64px;position:relative;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(700px 460px at 88% 0%,var(--yellow-dim),transparent 70%);
+}
+.hero-inner{position:relative;max-width:840px}
+.hero h1{font-size:clamp(36px,6.2vw,70px);font-weight:900;margin:20px 0 24px}
+.hero p.lede{font-size:clamp(17px,1.6vw,20px);color:var(--muted);max-width:600px;margin-bottom:36px}
+.hero-ctas{display:flex;gap:16px;flex-wrap:wrap}
+.hero-stats{display:flex;gap:40px;margin-top:54px;flex-wrap:wrap}
+.stat .num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:26px;color:var(--yellow)}
+.stat .lbl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+
+/* TICKER */
+.ticker{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;padding:16px 0;background:var(--surface)}
+.ticker-track{
+  display:flex;gap:56px;width:max-content;animation:scroll 26s linear infinite;
+  font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);white-space:nowrap;
+}
+.ticker-track b{color:var(--white);font-weight:600}
+.ticker-track .dot{color:var(--yellow)}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.ticker-track{animation:none}.btn-primary:hover{transform:none}.page.active{animation:none}}
+
+/* CARDS */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.card{
+  border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);
+  transition:transform .2s,border-color .2s;display:block;
+}
+.card:hover{transform:translateY(-4px);border-color:var(--yellow)}
+.thumb{
+  aspect-ratio:16/9;background:linear-gradient(135deg,var(--surface-2),var(--surface));
+  display:flex;align-items:center;justify-content:center;
+}
+.thumb .play{
+  width:48px;height:48px;border-radius:50%;background:var(--yellow);
+  display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:17px;
+}
+.card .meta{padding:18px}
+.card .tag{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--yellow)}
+.card h3{font-size:16px;font-weight:700;margin-top:8px;line-height:1.4}
+.card p.excerpt{color:var(--muted);font-size:14.5px;margin-top:8px}
+
+/* CHECKLIST */
+.checklist{list-style:none;margin:24px 0}
+.checklist li{padding:10px 0 10px 34px;position:relative;color:var(--muted);border-bottom:1px solid var(--line)}
+.checklist li::before{content:"✓";position:absolute;left:0;color:var(--yellow);font-weight:700}
+.checklist li b{color:var(--white)}
+
+/* SPLIT */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.panel{
+  border:1px solid var(--line);border-radius:12px;background:var(--surface);
+  padding:36px;position:relative;overflow:hidden;
+}
+.panel::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(360px 240px at 80% 10%,var(--yellow-dim),transparent 70%)}
+.price{font-family:'Unbounded',sans-serif;font-weight:900;font-size:44px;color:var(--yellow)}
+.price small{font-size:16px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-weight:400}
+.scarcity{
+  display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink);background:var(--yellow);border-radius:4px;padding:4px 10px;margin-bottom:18px;
+}
+.portrait{
+  aspect-ratio:4/5;border-radius:12px;background:linear-gradient(160deg,var(--surface-2),var(--surface));
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.portrait .placeholder{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;text-align:center;padding:0 24px}
+
+/* PAGE HERO */
+.page-hero{padding:88px 0 40px}
+.page-hero h1{font-size:clamp(32px,4.6vw,52px);font-weight:900;margin:18px 0 16px}
+.page-hero p{color:var(--muted);max-width:620px;font-size:18px}
+
+/* NEWSLETTER */
+.newsletter{text-align:center;background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.newsletter p{color:var(--muted);margin:0 auto 30px;max-width:480px}
+.signup{display:flex;gap:12px;max-width:480px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+.signup input{
+  flex:1;min-width:240px;padding:13px 18px;border-radius:4px;border:1px solid var(--line);
+  background:var(--ink);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:15px;
+}
+.signup input:focus{outline:2px solid var(--yellow);outline-offset:1px;border-color:transparent}
+
+/* FOOTER */
+footer{border-top:1px solid var(--line);padding:60px 0 36px;background:var(--surface)}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:44px}
+.footer-grid h4{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.footer-grid ul{list-style:none}
+.footer-grid li{margin-bottom:10px}
+.footer-grid a{color:var(--muted);font-size:15px;transition:color .2s}
+.footer-grid a:hover{color:var(--yellow)}
+.footer-brand p{color:var(--muted);font-size:14.5px;margin-top:14px;max-width:280px}
+.footer-bottom{border-top:1px solid var(--line);padding-top:26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+
+a:focus-visible,button:focus-visible{outline:2px solid var(--yellow);outline-offset:3px;border-radius:4px}
+
+@media (max-width:900px){
+  .grid-3{grid-template-columns:repeat(2,1fr)}
+  .split{grid-template-columns:1fr;gap:40px}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .portrait{max-width:380px}
+}
+@media (max-width:680px){
+  section{padding:60px 0}
+  .nav-links{
+    display:none;position:absolute;top:68px;left:0;right:0;background:var(--ink);
+    border-bottom:1px solid var(--line);flex-direction:column;padding:24px;gap:18px;align-items:flex-start;
+  }
+  .nav-links.open{display:flex}
+  .menu-toggle{display:block}
+  .grid-3,.grid-2{grid-template-columns:1fr}
+  .hero{padding:64px 0 48px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-inner">
+    <a class="logo" href="#home">SEBASTIEN <span>JEFFERIES</span></a>
+    <button class="menu-toggle" aria-label="Open menu" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button>
+    <div class="nav-links" id="navlinks">
+      <a href="#videos" data-page="videos">Videos</a>
+      <a href="#blog" data-page="blog">Blog</a>
+      <a href="#aicl" data-page="aicl">AI Creator Lab</a>
+      <a href="#sebintel" data-page="sebintel">SebIntel</a>
+      <a href="#work" data-page="work">Work With Me</a>
+      <a href="#about" data-page="about">About</a>
+      <a class="btn btn-primary nav-cta" href="#newsletter-section">Newsletter</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HOME ============ -->
+<div class="page" id="page-home">
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <p class="eyebrow">AI tools, decoded for creators</p>
+    <h1>Stop scrolling.<br>Start <span class="hl">creating with AI.</span></h1>
+    <p class="lede">I test the AI image, video and editing tools flooding your feed, then show you exactly how to use the ones that actually work. No hype, no fluff, just workflows you can steal today.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="#aicl">Join AI Creator Lab</a>
+      <a class="btn btn-ghost" href="#videos">Watch the latest</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="num">1M+</div><div class="lbl">Followers</div></div>
+      <div class="stat"><div class="num">5</div><div class="lbl">Platforms</div></div>
+      <div class="stat"><div class="num">10 yrs</div><div class="lbl">In social media</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>Worked with <b>Google</b></span><span class="dot">●</span>
+    <span><b>Meta</b></span><span class="dot">●</span>
+    <span><b>Samsung</b></span><span class="dot">●</span>
+    <span><b>Adobe</b></span><span class="dot">●</span>
+    <span><b>TikTok</b></span><span class="dot">●</span>
+    <span><b>X</b></span><span class="dot">●</span>
+    <span><b>DJI</b></span><span class="dot">●</span>
+    <span>Worked with <b>Google</b></span><span class="dot">●</span>
+    <span><b>Meta</b></span><span class="dot">●</span>
+    <span><b>Samsung</b></span><span class="dot">●</span>
+    <span><b>Adobe</b></span><span class="dot">●</span>
+    <span><b>TikTok</b></span><span class="dot">●</span>
+    <span><b>X</b></span><span class="dot">●</span>
+    <span><b>DJI</b></span><span class="dot">●</span>
+  </div>
+</div>
+
+<section>
+  <div class="wrap split">
+    <div class="portrait"><div class="placeholder">Hero portrait here<br>(4:5, yellow accent lighting would be perfect)</div></div>
+    <div>
+      <p class="eyebrow">Why this exists</p>
+      <h2>Creators don't need more AI hype. They need a shortcut.</h2>
+      <p style="color:var(--muted);margin-bottom:16px">I'm <b style="color:var(--white)">Seb</b>. Ten years deep in social media, now fully focused on one thing: figuring out which AI tools are worth your time, and showing over a million creators how to use them.</p>
+      <p style="color:var(--muted)">Brands like Google, Meta, Samsung and Adobe bring me in when they want their AI products explained to real creators. You get the same breakdowns, free, every week.</p>
+      <div style="display:flex;gap:24px;margin-top:24px;flex-wrap:wrap">
+        <a class="more-link" href="#about">More about Seb →</a>
+        <a class="more-link" href="https://www.youtube.com/SebastienJefferies/" target="_blank" rel="noopener">Watch on YouTube →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">On the feed</p>
+        <h2>Latest videos</h2>
+      </div>
+      <a class="more-link" href="#videos">All videos →</a>
+    </div>
+    <div class="grid-3">
+      <a class="card" href="#videos"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">AI Video</span><h3>Placeholder: latest upload pulls in here automatically</h3></div></a>
+      <a class="card" href="#videos"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Workflow</span><h3>Placeholder: second latest upload</h3></div></a>
+      <a class="card" href="#videos"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Editing</span><h3>Placeholder: third latest upload</h3></div></a>
+    </div>
+    <p class="note"><b>Build note:</b> when hosted, this grid auto-populates from the YouTube RSS feed for channel UCqcCVUAeQg90KQknq7H-7uA. Latest 15 uploads, zero maintenance.</p>
+  </div>
+</section>
+
+<section class="newsletter" id="newsletter-section">
+  <div class="wrap">
+    <p class="eyebrow" style="justify-content:center">The newsletter</p>
+    <h2>One email. Zero noise.</h2>
+    <p>When an AI tool is actually worth your time, you'll hear it from me first. What it does, what it costs and how to use it in your content this week.</p>
+    <div class="signup">
+      <input type="email" placeholder="your@email.com" aria-label="Email address">
+      <button class="btn btn-primary" onclick="alert('Connect to your email platform at hosting stage')">Join free</button>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- ============ VIDEOS ============ -->
+<div class="page" id="page-videos">
+<header class="page-hero"><div class="wrap">
+  <p class="eyebrow">Videos</p>
+  <h1>Every breakdown, <span class="hl">one place.</span></h1>
+  <p>Latest uploads land here automatically. Below that, the greatest hits: the videos worth starting with.</p>
+</div></header>
+<section style="padding-top:24px"><div class="wrap">
+  <div class="section-head"><div><h2 style="margin-top:0">Latest uploads</h2></div></div>
+  <div class="grid-3">
+    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Auto-feed</span><h3>RSS placeholder 1</h3></div></a>
+    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Auto-feed</span><h3>RSS placeholder 2</h3></div></a>
+    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Auto-feed</span><h3>RSS placeholder 3</h3></div></a>
+  </div>
+  <div class="section-head" style="margin-top:64px"><div><h2 style="margin-top:0">Start here</h2><p>Curated by Seb. The videos that explain the most, fastest.</p></div></div>
+  <div class="grid-3">
+    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Curated</span><h3>Awaiting your greatest hits list</h3></div></a>
+    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Curated</span><h3>Awaiting your greatest hits list</h3></div></a>
+    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Curated</span><h3>Awaiting your greatest hits list</h3></div></a>
+  </div>
+  <p class="note"><b>To do:</b> Seb sends 10 to 20 curated video URLs. Each becomes a card with real thumbnail, title and link.</p>
+</div></section>
+</div>
+
+<!-- ============ BLOG ============ -->
+<div class="page" id="page-blog">
+<header class="page-hero"><div class="wrap">
+  <p class="eyebrow">Blog</p>
+  <h1>The breakdowns, <span class="hl">in writing.</span></h1>
+  <p>Every article starts as a video. Read the workflow, watch the proof, steal the process.</p>
+</div></header>
+<section style="padding-top:24px"><div class="wrap">
+  <div class="grid-2">
+    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Coming soon</span><h3>Article placeholder: generated from video transcript</h3><p class="excerpt">Once transcripts arrive, each becomes a full SEO article in Seb's voice with the video embedded at the top.</p></div></a>
+    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Coming soon</span><h3>Article placeholder: generated from video transcript</h3><p class="excerpt">Target structure: hook intro, step-by-step workflow, tool links, CTA to AI Creator Lab.</p></div></a>
+  </div>
+  <p class="note"><b>To do:</b> Seb uploads transcripts (one doc, link + title + transcript per video). Claude drafts articles for review.</p>
+</div></section>
+</div>
+
+<!-- ============ AI CREATOR LAB ============ -->
+<div class="page" id="page-aicl">
+<header class="page-hero"><div class="wrap">
+  <p class="eyebrow">AI Creator Lab</p>
+  <h1>Create, learn and <span class="hl">monetize with AI.</span></h1>
+  <p>The go-to community for AI creators. Up-to-date workflows, live feedback from Seb and the team, and the tools that are actually worth using.</p>
+</div></header>
+<section style="padding-top:24px"><div class="wrap split">
+  <div>
+    <h2 style="margin-top:0">What's inside</h2>
+    <ul class="checklist">
+      <li><b>Step-by-step workflows</b>, updated as the tools change</li>
+      <li><b>Consistent AI characters</b> and visual styles, taught properly</li>
+      <li><b>Tool verdicts</b> so you stop wasting money on the wrong subscriptions</li>
+      <li><b>Live feedback and support</b> from Seb and the team</li>
+      <li><b>Monetization playbooks</b> from creators already earning with AI</li>
+      <li><b>Up to 60% off AI tools</b>, which can cover the membership on its own</li>
+    </ul>
+    <p style="color:var(--muted)">Built for creators, marketers, brands and anyone serious about standing out with AI.</p>
+  </div>
+  <div class="panel">
+    <span class="scarcity">Founding member pricing</span>
+    <div class="price">$67<small>/month, locked for life</small></div>
+    <p style="color:var(--muted);margin:16px 0 24px">Only 150 founding spots. Once they're gone, the price rises to $87/month.</p>
+    <a class="btn btn-primary" href="https://www.skool.com/aicreatorlab" target="_blank" rel="noopener">Join AI Creator Lab</a>
+    <p style="font-size:13px;color:var(--muted);margin-top:14px">Hosted on Skool. Cancel anytime.</p>
+  </div>
+</div>
+<div class="wrap"><p class="note"><b>To add:</b> member testimonials and results. Even 2 or 3 quotes will lift conversion significantly.</p></div>
+</section>
+</div>
+
+<!-- ============ SEBINTEL ============ -->
+<div class="page" id="page-sebintel">
+<header class="page-hero"><div class="wrap">
+  <p class="eyebrow">SebIntel</p>
+  <h1>My AI clone runs <span class="hl">an entire channel.</span></h1>
+  <p>SebIntel is a fully automated AI avatar of me, creating educational AI content on its own. Same face, same voice, zero filming.</p>
+</div></header>
+<section style="padding-top:24px"><div class="wrap split">
+  <div>
+    <h2 style="margin-top:0">Why I built it</h2>
+    <p style="color:var(--muted);margin-bottom:16px">The best way to prove AI content works isn't to talk about it. It's to build a channel where every video is AI-generated, then let the results speak.</p>
+    <p style="color:var(--muted);margin-bottom:16px">SebIntel posts educational AI content built on an automated pipeline: scripting, avatar generation, voice, editing and publishing. I oversee it. I don't film it.</p>
+    <p style="color:var(--muted)">The full system, every tool and every step, is taught inside AI Creator Lab.</p>
+    <div style="display:flex;gap:16px;margin-top:28px;flex-wrap:wrap">
+      <a class="btn btn-primary" href="#aicl">Learn how it's built</a>
+      <a class="btn btn-ghost" href="https://www.instagram.com/sebintel/" target="_blank" rel="noopener">See SebIntel live</a>
+    </div>
+  </div>
+  <div class="panel">
+    <p class="eyebrow" style="margin-bottom:18px">The pipeline, at a glance</p>
+    <ul class="checklist">
+      <li><b>Script</b> generated from trending AI topics</li>
+      <li><b>Avatar</b> performs it, cloned from real footage of Seb</li>
+      <li><b>Voice</b> cloned and synced automatically</li>
+      <li><b>Edit and publish</b> with no human in the loop</li>
+    </ul>
+    <p style="font-size:13px;color:var(--muted)">The exact stack is revealed inside AI Creator Lab.</p>
+  </div>
+</div></section>
+</div>
+
+<!-- ============ WORK WITH ME ============ -->
+<div class="page" id="page-work">
+<header class="page-hero"><div class="wrap">
+  <p class="eyebrow">Work with me</p>
+  <h1>Your AI product, explained to <span class="hl">a million creators.</span></h1>
+  <p>Brand partnerships, AI consulting and creator campaigns. If your product deserves attention, I know how to earn it.</p>
+</div></header>
+<section style="padding-top:24px"><div class="wrap">
+  <div class="grid-3">
+    <div class="card" style="padding:28px"><span class="tag">01</span><h3 class="display" style="margin:12px 0 10px;font-size:18px">Brand partnerships</h3><p class="excerpt">Sponsored Reels cross-posted to TikTok and YouTube Shorts. High-energy, education-first content that converts.</p></div>
+    <div class="card" style="padding:28px"><span class="tag">02</span><h3 class="display" style="margin:12px 0 10px;font-size:18px">AI consulting</h3><p class="excerpt">Helping brands understand and adopt AI content workflows, from strategy to execution.</p></div>
+    <div class="card" style="padding:28px"><span class="tag">03</span><h3 class="display" style="margin:12px 0 10px;font-size:18px">Speaking and education</h3><p class="excerpt">Workshops and sessions on AI content creation for teams and events.</p></div>
+  </div>
+  <div style="text-align:center;margin-top:48px">
+    <a class="btn btn-primary" href="mailto:business@sebastienjefferies.com">Get in touch</a>
+    <p style="font-size:13px;color:var(--muted);margin-top:14px">business@sebastienjefferies.com</p>
+  </div>
+  <p class="note"><b>To add:</b> brand logos row, case studies or campaign results, and a media kit download. Bookmarked for the next pass.</p>
+</div></section>
+</div>
+
+<!-- ============ ABOUT ============ -->
+<div class="page" id="page-about">
+<header class="page-hero"><div class="wrap">
+  <p class="eyebrow">About</p>
+  <h1>Hi, I'm <span class="hl">Seb.</span></h1>
+  <p>Content creator, AI educator and the person brands call when they need AI explained to real creators.</p>
+</div></header>
+<section style="padding-top:24px"><div class="wrap split">
+  <div class="portrait"><div class="placeholder">About page portrait here</div></div>
+  <div>
+    <p style="color:var(--muted);margin-bottom:16px">I've spent 10 years in social media marketing, specialising in Instagram, copywriting and organic growth. These days I focus on one mission: cutting through AI hype so creators can actually use this stuff.</p>
+    <p style="color:var(--muted);margin-bottom:16px">Over 1 million people follow my breakdowns across Instagram, TikTok, YouTube, LinkedIn and X. I've partnered with Google, Meta, Samsung, Adobe, TikTok and DJI, and I run AI Creator Lab, the community where I teach everything in depth.</p>
+    <p style="color:var(--muted)">Based in Richmond, UK. Powered by SJ Productions Ltd and two cats with strong opinions.</p>
+    <div style="display:flex;gap:24px;margin-top:28px;flex-wrap:wrap">
+      <a class="more-link" href="https://www.instagram.com/sebastien" target="_blank" rel="noopener">Instagram →</a>
+      <a class="more-link" href="https://www.youtube.com/SebastienJefferies/" target="_blank" rel="noopener">YouTube →</a>
+      <a class="more-link" href="https://www.linkedin.com/in/sebastienjefferies/" target="_blank" rel="noopener">LinkedIn →</a>
+    </div>
+  </div>
+</div></section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="logo" href="#home">SEBASTIEN <span>JEFFERIES</span></a>
+        <p>AI tools, tech and video editing, decoded for creators who want results, not hype.</p>
+      </div>
+      <div><h4>Explore</h4><ul>
+        <li><a href="#videos">Videos</a></li>
+        <li><a href="#blog">Blog</a></li>
+        <li><a href="#aicl">AI Creator Lab</a></li>
+        <li><a href="#sebintel">SebIntel</a></li>
+      </ul></div>
+      <div><h4>Connect</h4><ul>
+        <li><a href="https://www.instagram.com/sebastien" target="_blank" rel="noopener">Instagram</a></li>
+        <li><a href="https://www.youtube.com/SebastienJefferies/" target="_blank" rel="noopener">YouTube</a></li>
+        <li><a href="https://www.linkedin.com/in/sebastienjefferies/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://www.instagram.com/sebintel/" target="_blank" rel="noopener">SebIntel</a></li>
+      </ul></div>
+      <div><h4>Business</h4><ul>
+        <li><a href="#work">Work with me</a></li>
+        <li><a href="mailto:business@sebastienjefferies.com">Contact</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 SJ Productions Ltd. All opinions are Seb's own.</span>
+      <span>Richmond, Surrey, UK</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const pages=["home","videos","blog","aicl","sebintel","work","about"];
+function route(){
+  let h=(location.hash||"#home").replace("#","");
+  if(h==="newsletter-section"){showPage("home");setTimeout(()=>{document.getElementById("newsletter-section").scrollIntoView({behavior:"smooth"})},60);return}
+  if(!pages.includes(h))h="home";
+  showPage(h);
+  window.scrollTo({top:0});
+}
+function showPage(name){
+  pages.forEach(p=>{
+    document.getElementById("page-"+p).classList.toggle("active",p===name);
+  });
+  document.querySelectorAll(".nav-links a[data-page]").forEach(a=>{
+    a.classList.toggle("active",a.dataset.page===name);
+  });
+  document.getElementById("navlinks").classList.remove("open");
+}
+window.addEventListener("hashchange",route);
+route();
+</script>
+
+</body>
+</html>
