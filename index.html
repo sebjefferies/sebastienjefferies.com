@@ -175,6 +175,21 @@ nav{
 .page-hero h1{font-size:clamp(32px,4.6vw,52px);font-weight:900;margin:18px 0 16px}
 .page-hero p{color:var(--muted);max-width:620px;font-size:18px}
 
+/* ARTICLE */
+.article{max-width:760px;margin:0 auto}
+.article .video-embed{aspect-ratio:16/9;border-radius:10px;overflow:hidden;border:1px solid var(--line);margin-bottom:36px;background:var(--surface)}
+.article .video-embed iframe{width:100%;height:100%;border:0;display:block}
+.article h2{font-size:26px;margin:40px 0 16px;font-weight:800}
+.article h3{font-size:19px;margin:28px 0 10px;font-weight:700}
+.article p{color:var(--muted);margin-bottom:16px;font-size:16px;line-height:1.75}
+.article p b,.article li b{color:var(--white)}
+.article ul{margin:14px 0 20px 22px;color:var(--muted)}
+.article li{margin-bottom:8px;line-height:1.65}
+.article .cta-panel{margin-top:48px;text-align:center}
+.article .cta-panel h3{margin-top:0}
+.article .back-link{display:inline-block;margin-bottom:24px}
+.article .meta-row{display:flex;gap:14px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+
 /* NEWSLETTER */
 .newsletter{text-align:center;background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .newsletter p{color:var(--muted);margin:0 auto 30px;max-width:480px}
@@ -375,10 +390,157 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--yellow);outline-off
 </div></header>
 <section style="padding-top:24px"><div class="wrap">
   <div class="grid-2">
-    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Coming soon</span><h3>Article placeholder: generated from video transcript</h3><p class="excerpt">Once transcripts arrive, each becomes a full SEO article in Seb's voice with the video embedded at the top.</p></div></a>
-    <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Coming soon</span><h3>Article placeholder: generated from video transcript</h3><p class="excerpt">Target structure: hook intro, step-by-step workflow, tool links, CTA to AI Creator Lab.</p></div></a>
+    <a class="card" href="#blog-veo3-json"><div class="thumb"><img src="https://i.ytimg.com/vi/6LhkvHfpjAY/hqdefault.jpg" alt=""><div class="play">▶</div></div><div class="meta"><span class="tag">Video Generation</span><h3>How To Use Google Veo 3 Like A Pro: JSON Prompting Explained</h3><p class="excerpt">The exact JSON prompt structure creators are using to make Veo 3 ads that look like $100K productions, plus a free workflow to generate your own.</p></div></a>
+    <a class="card" href="#blog-ai-clone-videos"><div class="thumb"><img src="https://i.ytimg.com/vi/wf7XQ_Rj-I4/hqdefault.jpg" alt=""><div class="play">▶</div></div><div class="meta"><span class="tag">AI Avatars</span><h3>How To Create AI Videos That Actually Look Like You</h3><p class="excerpt">A step-by-step workflow for building a realistic AI version of yourself, so you can create on-camera content without ever picking up a camera.</p></div></a>
+    <a class="card" href="#blog-ai-editing-tools"><div class="thumb"><img src="https://i.ytimg.com/vi/q8XuH_R83f0/hqdefault.jpg" alt=""><div class="play">▶</div></div><div class="meta"><span class="tag">Editing</span><h3>AI Video Editing Tools You Need</h3><p class="excerpt">The AI editing tools actually worth paying for in your stack right now, and exactly where each one fits in your workflow.</p></div></a>
   </div>
-  <p class="note"><b>To do:</b> Seb uploads transcripts (one doc, link + title + transcript per video). Claude drafts articles for review.</p>
+  <p class="note"><b>More on the way:</b> new articles get added every time a video drops. <a href="#aicl">Join AI Creator Lab</a> for the full workflows, templates and prompts behind each one.</p>
+</div></section>
+</div>
+
+<!-- ============ BLOG POST: VEO 3 JSON PROMPTING ============ -->
+<div class="page" id="page-blog-veo3-json">
+<section style="padding-top:88px"><div class="wrap article">
+  <a class="more-link back-link" href="#blog">← Back to Blog</a>
+  <p class="eyebrow">Video Generation</p>
+  <h1 style="font-size:clamp(28px,4.2vw,46px);font-weight:900;margin:14px 0 24px;line-height:1.15">How To Use Google Veo 3 Like A Pro: JSON Prompting Explained</h1>
+  <div class="video-embed"><iframe src="https://www.youtube.com/embed/6LhkvHfpjAY" title="This Is How To Use Google Veo 3 Like A PRO: JSON Prompt" allowfullscreen loading="lazy"></iframe></div>
+
+  <p>If you've scrolled past one of those ads lately that looks like a $100,000 production, an Apple Watch glowing under studio lighting, a Tesla gliding through a showroom, a Dior bottle drifting through a haze of flower petals, there's a good chance it wasn't filmed at all. It was generated with <b>Google Veo 3</b>, and the people making them aren't using fancy camera rigs or VFX teams. They're using one tool and one prompt, written in a very specific format: <b>JSON</b>.</p>
+
+  <p>I broke down exactly how this works in the video above, and I'm putting the workflow in writing here so you can come back to it whenever you're ready to build your own.</p>
+
+  <h2>Why JSON prompting beats normal text prompts</h2>
+  <p>You can absolutely type a plain English prompt into Veo 3 and get a decent result. But side by side, JSON-structured prompts consistently look more cinematic, more controlled, and closer to an actual ad. The reason comes down to how the model reads your instructions.</p>
+  <p>A normal prompt is just a wall of text: "add this, also do that, but don't do this, and make sure the lighting is..." The model has to parse all of that fluff and guess at priority. A JSON prompt instead breaks your scene down into clearly labeled fields, things like camera, subject, action, environment, lighting, and audio, so the model reads it more like a set of instructions than a paragraph. Less ambiguity in, better video out.</p>
+
+  <h2>The workflow: building JSON prompts in seconds</h2>
+  <p>You don't need to learn JSON syntax by hand. Here's the exact process I use:</p>
+  <ul>
+    <li><b>Set up a project in ChatGPT (or a Gem in Gemini).</b> Add custom instructions telling it to act as a Veo 3 JSON prompt generator, then upload a handful of example JSON prompts as project files for it to reference.</li>
+    <li><b>Describe what you want in plain English.</b> Something like "create a JSON prompt for a Tesla ad" or "I want a bottle of shampoo to start hovering in a bathroom." If you've got a product photo, attach it and ask the model to build the scene around it.</li>
+    <li><b>Copy the generated JSON prompt.</b> The project will spit out a fully structured prompt with the camera angle, subject, action, environment, lighting and dialogue/audio all defined for you.</li>
+    <li><b>Head to flow.google to access Veo 3.</b> This is Google's dedicated video creation interface, click "Create with Flow," start a new project, and paste in your JSON prompt.</li>
+    <li><b>Pick the right model setting.</b> Use <b>Veo 3 Fast</b> if you want to conserve credits (20 credits per generation, 720p, audio included). Use the <b>Quality</b> setting with "beta audio" enabled if you want the highest fidelity output.</li>
+    <li><b>Generate, then upscale.</b> Hit generate and let it run. If you used Fast mode and want higher resolution, download the clip and upscale it to 1080p (or 4K with a third-party upscaler).</li>
+  </ul>
+
+  <h3>Getting Veo 3 access for free</h3>
+  <p>Veo 3 through Flow is a paid feature, but there's a workaround: search for the <b>Google AI Pro</b> plan and check the subscription page. Google has been running a free 1-month trial of AI Pro that includes access to Flow and Veo 3, with a generous monthly credit allowance. That's more than enough to test the workflow above and generate your first batch of ad-style clips before deciding whether to pay.</p>
+
+  <h2>Tools used in this workflow</h2>
+  <ul>
+    <li><b>Google Veo 3 (via flow.google)</b> — the video generation model itself</li>
+    <li><b>ChatGPT or Gemini (Projects/Gems)</b> — for turning plain-English ideas into structured JSON prompts</li>
+    <li><b>Google AI Pro</b> — the easiest way to get free trial access to Flow and Veo 3</li>
+  </ul>
+
+  <h2>Where to go from here</h2>
+  <p>JSON prompting is the difference between "AI video that looks like AI video" and "AI video that looks like a real ad." Once you've got the structure down, the only limit is how creative you get with the scene description, swap in your own products, your own brand colors, your own voiceover script, and you've got an ad library that would normally cost thousands per video.</p>
+
+  <div class="cta-panel panel">
+    <p class="eyebrow" style="justify-content:center">Want the templates?</p>
+    <h3>Get my exact JSON prompt library and project setup</h3>
+    <p style="margin-bottom:20px">Inside AI Creator Lab I share the ready-to-use JSON prompt templates, the ChatGPT project files, and the full breakdown of how SebIntel uses this exact workflow every week.</p>
+    <a class="btn btn-primary" href="#aicl">Join AI Creator Lab</a>
+  </div>
+</div></section>
+</div>
+
+<!-- ============ BLOG POST: AI CLONE / AVATAR VIDEOS ============ -->
+<div class="page" id="page-blog-ai-clone-videos">
+<section style="padding-top:88px"><div class="wrap article">
+  <a class="more-link back-link" href="#blog">← Back to Blog</a>
+  <p class="eyebrow">AI Avatars</p>
+  <h1 style="font-size:clamp(28px,4.2vw,46px);font-weight:900;margin:14px 0 24px;line-height:1.15">How To Create AI Videos That Actually Look Like You</h1>
+  <div class="video-embed"><iframe src="https://www.youtube.com/embed/wf7XQ_Rj-I4" title="How To Create AI Videos That Actually Look Like YOU" allowfullscreen loading="lazy"></iframe></div>
+
+  <p>One of the questions I get asked the most is some version of: "How do you film so much content?" The honest answer is, increasingly, I don't. A growing chunk of what shows up on my channels is generated using an <b>AI version of me</b>, trained on real footage, that can speak, move and react just like I would on camera.</p>
+
+  <p>This isn't a gimmick or a novelty filter. It's the same underlying tech I use to run <a href="#sebintel">SebIntel</a>, my fully AI-generated channel. Here's the workflow for building a digital version of yourself that's actually convincing.</p>
+
+  <h2>Step 1: Capture your source footage</h2>
+  <p>Every AI avatar tool needs reference material to learn from, your face, your voice, your mannerisms. The better the source footage, the better the clone. You want:</p>
+  <ul>
+    <li><b>A few minutes of clean, well-lit video</b> of you talking to camera, ideally in different angles and expressions</li>
+    <li><b>A clear audio sample</b> of your voice, at least a couple of minutes, free from background noise</li>
+    <li><b>Consistent lighting</b> across your clips, this matters more than most people expect for how realistic the final output looks</li>
+  </ul>
+
+  <h2>Step 2: Build your AI character</h2>
+  <p>Once you've got source footage, you feed it into a character/avatar generation tool. These tools analyze your photos and video to learn your unique look, then let you generate "infinite" new scenes of yourself, different locations, outfits and poses, without filming any of it.</p>
+  <p>This is the same category of tool used for the "make your own character" workflows you've probably seen creators use to generate themselves in completely different settings: a photographer in Paris one minute, on a couch at home the next, all from a handful of source images.</p>
+
+  <h2>Step 3: Clone your voice</h2>
+  <p>Run your clean audio sample through a voice cloning tool. Most modern voice AI tools only need a couple of minutes of audio to produce a convincing clone that you can then use to generate any script, in your own voice, without recording a single new line.</p>
+
+  <h2>Step 4: Script, generate, and assemble</h2>
+  <p>With your AI character and AI voice ready, the rest of the workflow looks like this:</p>
+  <ul>
+    <li><b>Write or generate a script</b> for the video, just like you would for a normal piece of content</li>
+    <li><b>Generate your avatar performing the script</b> using your character model and cloned voice</li>
+    <li><b>Edit and polish</b> the output, adding b-roll, captions, music and transitions like you would with any other video</li>
+  </ul>
+  <p>The end result is a video that looks and sounds like you, performing a script you may never have actually said out loud, filmed in a location you've never been to.</p>
+
+  <h2>Why this matters for creators</h2>
+  <p>This isn't about replacing yourself, it's about removing the bottleneck. Filming is the slowest, most logistically annoying part of content creation: lighting, setup, retakes, locations. An AI version of you removes all of that, so the only thing left between you and a finished video is the script.</p>
+
+  <h2>Tools used in this workflow</h2>
+  <ul>
+    <li><b>AI character/avatar generators</b> — for building a consistent AI version of yourself from photos and video</li>
+    <li><b>AI voice cloning tools</b> — for generating new lines in your own voice from a short sample</li>
+    <li><b>A standard editing tool</b> — for assembling the final video (see the AI editing tools article for what I recommend)</li>
+  </ul>
+
+  <div class="cta-panel panel">
+    <p class="eyebrow" style="justify-content:center">Want the full pipeline?</p>
+    <h3>See exactly how SebIntel runs on this workflow</h3>
+    <p style="margin-bottom:20px">Inside AI Creator Lab I break down the exact tools, settings and prompts behind my AI clone, plus the scripting and publishing pipeline that runs SebIntel on autopilot.</p>
+    <a class="btn btn-primary" href="#aicl">Join AI Creator Lab</a>
+  </div>
+</div></section>
+</div>
+
+<!-- ============ BLOG POST: AI VIDEO EDITING TOOLS ============ -->
+<div class="page" id="page-blog-ai-editing-tools">
+<section style="padding-top:88px"><div class="wrap article">
+  <a class="more-link back-link" href="#blog">← Back to Blog</a>
+  <p class="eyebrow">Editing</p>
+  <h1 style="font-size:clamp(28px,4.2vw,46px);font-weight:900;margin:14px 0 24px;line-height:1.15">AI Video Editing Tools You Need</h1>
+  <div class="video-embed"><iframe src="https://www.youtube.com/embed/q8XuH_R83f0" title="AI Video Editing Tools You NEED" allowfullscreen loading="lazy"></iframe></div>
+
+  <p>AI video <i>generation</i> gets all the attention, but generation is only half the job. The clips you create with Veo, Kling or your AI avatar still need to be cut, captioned, cleaned up and turned into something postable. That's where AI editing tools come in, and most creators are sleeping on how good they've gotten.</p>
+
+  <p>Here's the editing stack I actually rely on, broken down by what each tool is for.</p>
+
+  <h2>1. AI captioning and auto-editing</h2>
+  <p>If you only add one AI tool to your editing process, make it an auto-captioning tool. The best ones don't just transcribe your audio, they auto-detect silences and dead space and let you cut them out by deleting text, turning a rough cut into a tight, fast-paced edit in minutes instead of hours.</p>
+
+  <h2>2. AI upscaling and restoration</h2>
+  <p>If you're generating clips at 720p (which is common with faster, cheaper generation modes), an AI upscaler is non-negotiable. These tools use AI to intelligently add detail when scaling footage up to 1080p or 4K, so your AI-generated clips hold up next to traditionally filmed footage.</p>
+
+  <h2>3. AI b-roll and clip generation</h2>
+  <p>For talking-head content, AI b-roll generators let you describe a shot ("close-up of hands typing on a laptop, warm lighting") and generate a matching clip to cut away to, instead of digging through stock footage libraries that never quite match your vibe.</p>
+
+  <h2>4. Voice cleanup and enhancement</h2>
+  <p>AI audio tools can strip background noise, balance levels and even fix muffled or low-quality audio recordings automatically. If your footage has rough audio, run it through one of these before you do anything else, it makes a bigger difference to perceived quality than almost any visual edit.</p>
+
+  <h2>5. Repurposing and clipping</h2>
+  <p>If you're turning long-form videos (like YouTube uploads) into shorts, an AI clipping tool can scan a full video, identify the most engaging moments, and auto-generate vertical clips with captions ready to post. This is how creators turn one long video into 5-10 pieces of short-form content without manually scrubbing through footage.</p>
+
+  <h2>How these fit together</h2>
+  <p>My actual workflow looks like this: generate or film raw footage → clean up audio → auto-edit and caption the rough cut → upscale if needed → generate any extra b-roll → repurpose the long-form video into shorts. Each step is a separate AI tool, but together they cut my editing time down dramatically compared to doing all of this manually.</p>
+
+  <h2>The bottom line</h2>
+  <p>You don't need every tool in this list on day one. Start with auto-captioning, since it has the single biggest impact on watch time and editing speed, then add the others as your output increases and the manual work starts to pile up.</p>
+
+  <div class="cta-panel panel">
+    <p class="eyebrow" style="justify-content:center">Want my exact stack?</p>
+    <h3>See the specific tools, settings and subscriptions I use</h3>
+    <p style="margin-bottom:20px">Inside AI Creator Lab I share my full editing stack with direct links, discount codes (up to 60% off), and walkthroughs of how each tool fits into a real publishing workflow.</p>
+    <a class="btn btn-primary" href="#aicl">Join AI Creator Lab</a>
+  </div>
 </div></section>
 </div>
 
@@ -520,7 +682,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--yellow);outline-off
 </footer>
 
 <script>
-const pages=["home","videos","blog","aicl","sebintel","work","about"];
+const pages=["home","videos","blog","blog-veo3-json","blog-ai-clone-videos","blog-ai-editing-tools","aicl","sebintel","work","about"];
 function route(){
   let h=(location.hash||"#home").replace("#","");
   if(h==="newsletter-section"){showPage("home");setTimeout(()=>{document.getElementById("newsletter-section").scrollIntoView({behavior:"smooth"})},60);return}
