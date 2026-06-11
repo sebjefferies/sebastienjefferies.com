@@ -130,7 +130,7 @@ async function getCurated(shortIds) {
       thumbnail: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
       published: "",
     }));
-    return await filterOutShorts(list, shortIds);
+    return await filterOutShorts(list, shortIds, true);
   } catch {
     return [];
   }
@@ -218,7 +218,7 @@ async function getChannelVideosByDate(shortIds) {
       })
       .filter((v) => v.id);
 
-    return await filterOutShorts(parsed, shortIds);
+    return await filterOutShorts(parsed, shortIds, true);
   } catch {
     return [];
   }
@@ -271,9 +271,14 @@ async function getShorts() {
 
 // Filters a list of {id,...} videos, removing any that are YouTube Shorts.
 // Uses the known-Shorts ID set (scraped from the Shorts tab) as the primary
-// signal, falling back to an oEmbed dimension check for anything not in it.
-async function filterOutShorts(list, shortIds) {
+// signal, falling back to an oEmbed dimension check for anything not in it
+// (unless strict mode is requested, which skips oEmbed entirely to avoid
+// burning through the Worker's subrequest budget).
+async function filterOutShorts(list, shortIds, strict = false) {
   const ids = shortIds || new Set();
+  if (strict) {
+    return list.filter((v) => !ids.has(v.id));
+  }
   const flags = await Promise.all(
     list.map((v) => (ids.has(v.id) ? Promise.resolve(true) : isShort(v.id)))
   );
