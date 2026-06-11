@@ -118,11 +118,13 @@ nav{
 .card:hover{transform:translateY(-4px);border-color:var(--yellow)}
 .thumb{
   aspect-ratio:16/9;background:linear-gradient(135deg,var(--surface-2),var(--surface));
-  display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
 }
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .thumb .play{
   width:48px;height:48px;border-radius:50%;background:var(--yellow);
   display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:17px;
+  position:relative;z-index:1;
 }
 .card .meta{padding:18px}
 .card .tag{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--yellow)}
@@ -283,12 +285,11 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--yellow);outline-off
       </div>
       <a class="more-link" href="#videos">All videos →</a>
     </div>
-    <div class="grid-3">
+    <div class="grid-3" id="home-videos-grid">
       <a class="card" href="#videos"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">AI Video</span><h3>Placeholder: latest upload pulls in here automatically</h3></div></a>
       <a class="card" href="#videos"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Workflow</span><h3>Placeholder: second latest upload</h3></div></a>
       <a class="card" href="#videos"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Editing</span><h3>Placeholder: third latest upload</h3></div></a>
     </div>
-    <p class="note"><b>Build note:</b> when hosted, this grid auto-populates from the YouTube RSS feed for channel UCqcCVUAeQg90KQknq7H-7uA. Latest 15 uploads, zero maintenance.</p>
   </div>
 </section>
 
@@ -315,7 +316,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--yellow);outline-off
 </div></header>
 <section style="padding-top:24px"><div class="wrap">
   <div class="section-head"><div><h2 style="margin-top:0">Latest uploads</h2></div></div>
-  <div class="grid-3">
+  <div class="grid-3" id="videos-latest-grid">
     <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Auto-feed</span><h3>RSS placeholder 1</h3></div></a>
     <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Auto-feed</span><h3>RSS placeholder 2</h3></div></a>
     <a class="card" href="#"><div class="thumb"><div class="play">▶</div></div><div class="meta"><span class="tag">Auto-feed</span><h3>RSS placeholder 3</h3></div></a>
@@ -503,6 +504,30 @@ function showPage(name){
 }
 window.addEventListener("hashchange",route);
 route();
+
+// ===== Latest videos (YouTube RSS via Pages Function) =====
+async function loadVideos(){
+  try{
+    const res=await fetch("/api/videos");
+    const data=await res.json();
+    const videos=(data.videos||[]).filter(v=>v.id);
+    if(!videos.length)return;
+
+    const cardHTML=(v,tag)=>`<a class="card" href="${v.link}" target="_blank" rel="noopener"><div class="thumb"><img src="${v.thumbnail}" alt="" loading="lazy"><div class="play">▶</div></div><div class="meta"><span class="tag">${tag}</span><h3>${escapeHTML(v.title)}</h3></div></a>`;
+
+    const home=document.getElementById("home-videos-grid");
+    if(home)home.innerHTML=videos.slice(0,3).map(v=>cardHTML(v,"Latest")).join("");
+
+    const latest=document.getElementById("videos-latest-grid");
+    if(latest)latest.innerHTML=videos.slice(0,3).map(v=>cardHTML(v,"Auto-feed")).join("");
+  }catch(e){
+    console.error("Failed to load videos",e);
+  }
+}
+function escapeHTML(str){
+  return str.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+loadVideos();
 </script>
 
 </body>
